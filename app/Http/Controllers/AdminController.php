@@ -3,12 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Role;
 use Illuminate\Http\Request;
 
 use App\Tag;
+use App\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class AdminController extends Controller
 {
+    public function index(Request $request){
+        //need to check if we are logged in and admin user...
+        if (!Auth::check() && $request->path() != 'login') {
+            return redirect('/login');
+        }
+
+        if (!Auth::check() && $request->path() == 'login') {
+
+            return view('welcome');
+        }
+        //when have already logged in we need to allow admin user to home and normal user to login again
+        $user = Auth::user();
+        if ($user->role_id == 'User') {
+            return redirect('/login');
+        }
+        if ($request->path() == 'login') {
+            return redirect('/');
+        }
+        return view('welcome');
+
+    }
+
+    public function logout(){
+        Auth::logout();
+        return redirect('/login');
+    }
+
+
     public function addTag(Request $request){
         //validate request
         $this->validate($request,[
@@ -55,8 +88,10 @@ class AdminController extends Controller
        return 'File Deleted Successfully!';
 
     }
-    public function deleteFileFromServer($fileName){
-        $filePath = public_path().'/uploads/'.$fileName;
+    public function deleteFileFromServer($fileName, $hasFullPath = false){
+        if (!$hasFullPath) {
+            $filePath = public_path().'/uploads/'.$fileName;
+        }
        if (file_exists($filePath)) {
            @unlink($filePath);
        }
@@ -99,6 +134,112 @@ class AdminController extends Controller
         return Category::where('id', $request->id)->delete();
 
     }
+
+    public function getUsers(){
+        return User::with('role')->get();
+
+    }
+
+    public function createUser(Request $request){
+        $this->validate($request,[
+            'fullname' =>'required',
+            'email' => 'bail|required|email|unique:users',
+            'password' => 'bail|required|min:6',
+            'role_id' => 'required'
+        ]);
+        $password = bcrypt($request->password);
+        $user = User::create([
+            'fullname' => $request->fullname,
+            'email' =>$request->email,
+            'password' => $password,
+            'role_id' =>$request->role_id
+        ]);
+        return $user;
+    }
+    public function editUser(Request $request){
+        $this->validate($request,[
+            'fullname' =>'required',
+            'email' => "bail|required|email|unique:users,email,$request->id", //this validation prevents having unique email when the user with same email tries to update other things
+            'password' => 'min:6', //bail prevents from doing other validtaion if the first one fails
+            'role_id' => 'required'
+        ]);
+        $data = [
+            'fullname' => $request->fullname,
+            'email' =>$request->email,
+            'role_id' =>$request->role_id
+        ];
+        if($request->password){
+            $password = bcrypt($request->password);
+            $data['password'] = $password;
+        }
+        $user = User::where('id', $request->id)->update($data);
+        return $user;
+    }
+    public function deleteUser(Request $request){
+        $this->validate($request,[
+            'fullname'=>'required',
+            'email' => 'required',
+            'role_id' => 'required',
+            // 'password' => 'required',
+        ]);
+        return User::where('id', $request->id)->delete();
+    }
+
+    public function adminLogin(Request $request){
+        $this->validate($request,[
+            'email' => 'bail|required|email',
+            'password' => 'bail|required|min:6',
+        ]);
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = Auth::user();
+            //laravel ley table plural cha vannae singular vayera access garcha
+            //yeha user->role->isAdmin garna sakhcha kina vanae role_id foreign key huncha user table ma
+            //role_id field user table ma rakhne bhetikaii roles table ko ho vanera chincha ani foregin key huncha
+            if ($user->role->isAdmin == 0) {
+               Auth::logout();
+               return response()->json([
+                'msg'=>'Incorrect login details!'
+               ],401);
+            }
+            return response()->json([
+                'msg'=>'You are logged in!',
+                'user'=>$user
+            ]);
+        }
+        else{
+            return response()->json([
+                'msg'=>'Incorrect login details!'
+            ],401);
+        }
+    }
+
+    public function getRoles()
+    {
+        return Role::all();
+    }
+
+    public function addRole(Request $request)
+    {
+        // validate request
+        $this->validate($request, [
+            'rolename' => 'required',
+        ]);
+        return Role::create([
+            'rolename' => $request->rolename,
+        ]);
+    }
+    public function editRole(Request $request)
+    {
+        // validate request
+        $this->validate($request, [
+            'rolename' => 'required',
+        ]);
+        return Role::where('id', $request->id)->update([
+            'rolename' => $request->rolename,
+        ]);
+    }
+
+
 
 
 }

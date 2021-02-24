@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,25 +14,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get( 'app/get_tags', 'AdminController@getTags');
-Route::post('app/create_tag', 'AdminController@addTag');
-Route::post('app/edit_tag', 'AdminController@editTag');
-Route::post('app/delete_tag', 'AdminController@deleteTag');
-Route::post('app/upload', 'AdminController@upload' );
-Route::post('app/delete_image', 'AdminController@deleteImage' );
+Route::prefix('app')->middleware([AdminCheck::class])->group(function(){
+    Route::get( '/get_tags', 'AdminController@getTags');
+    Route::post('/create_tag', 'AdminController@addTag');
+    Route::post('/edit_tag', 'AdminController@editTag');
+    Route::post('/delete_tag', 'AdminController@deleteTag');
+    Route::post('/upload', 'AdminController@upload' );
+    Route::post('/delete_image', 'AdminController@deleteImage' );
 
-Route::get('app/get_category', 'AdminController@getCategory');
-Route::post('app/create_category', 'AdminController@addCategory');
-Route::post('app/edit_category', 'AdminController@editCategory');
-Route::post('app/delete_category', 'AdminController@deleteCategory');
+    Route::get('/get_category', 'AdminController@getCategory');
+    Route::post('/create_category', 'AdminController@addCategory');
+    Route::post('/edit_category', 'AdminController@editCategory');
+    Route::post('/delete_category', 'AdminController@deleteCategory');
 
+    Route::get( '/get_users', 'AdminController@getUsers');
+    Route::post('/create_user', 'AdminController@createUser');
+    Route::post('/edit_user', 'AdminController@editUser');
+    Route::post('/delete_user', 'AdminController@deleteUser');
 
-Route::get('/', function () {
-    return view('welcome');
+    Route::post('/admin_login', 'AdminController@adminLogin');
+
+    //  roles routes
+    Route::get('get_roles', 'AdminController@getRoles');
+    Route::post('create_role', 'AdminController@addRole');
+    Route::post('edit_role', 'AdminController@editRole');
 });
 
-Route::get('/new', 'TestController@index');
+Route::get('/logout', 'AdminController@logout');
 
-Route::any('{slug}', function () {
-    return view('welcome');
-});
+Route::get('/', 'AdminController@index');
+Route::any('{slug}', 'AdminController@index');
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Route::get('/new', 'TestController@index');
+
+// Route::any('{slug}', function () {
+//     return view('welcome');
+// });
