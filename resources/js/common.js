@@ -48,6 +48,33 @@ export default {
                 title: title,
                 desc: desc
             });
-        }
+        },
+        handleSpinCustom () {
+            this.$Spin.show({
+                render: (h) => {
+                    return h('div', [
+                        h('Icon', {
+                            'class': 'demo-spin-icon-load',
+                            props: {
+                                type: 'ios-loading',
+                                size: 18
+                            }
+                        }),
+                        h('div', 'Loading')
+                    ])
+                }
+            });
+            setTimeout(() => {
+                this.$Spin.hide();
+            }, 2000);
+        },
+
+        // handleSpinShow () {
+        //     this.$Spin.show();
+        //     setTimeout(() => {
+        //         this.$Spin.hide();
+        //     }, 1000);
+        // },
     }
 }
+

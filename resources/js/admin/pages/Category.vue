@@ -165,32 +165,14 @@
             >
           </div>
         </Modal>
-        <!-- modal for deleting category -->
-        <Modal v-model="showDeleteModal" width="360">
-          <p slot="header" style="color: #f60; text-align: center">
-            <Icon type="ios-information-circle"></Icon>
-            <span>Delete confirmation</span>
-          </p>
-          <div style="text-align: center">
-            <p>Are you sure you want to delete it?</p>
-          </div>
-          <div slot="footer">
-            <Button
-              type="error"
-              size="large"
-              long
-              :loading="isDeleting"
-              :disabled="isDeleting"
-              @click="deleteCategory"
-              >Delete</Button
-            >
-          </div>
-        </Modal>
+        <DeleteModal></DeleteModal>
       </div>
     </div>
   </div>
 </template>
 <script>
+import DeleteModal from './components/deleteModal'
+import {mapGetters} from 'vuex'
 export default {
   data() {
     return {
@@ -261,8 +243,6 @@ export default {
         this.categoryLists[this.index].categoryName = this.editData.categoryName;
         this.success("Category has been edited successfully!");
         this.editModal = false;
-        // this.editData.categoryName = "";
-        // this.editData.iconImage = "";
       } else {
         if (res.status == 422) {
           if (res.data.errors.categoryName) {
@@ -278,17 +258,10 @@ export default {
     },
 
     showEditModal(category, i) {
-      //this is done to prevent real time changing in display while typing in input box
-    //   let editObj = {
-    //     id: category.id,
-    //     categoryName: category.categoryName,
-    //     iconImage: category.iconImage,
-    //   };
       this.editData = category;
       this.editModal = true;
       this.index = i;
       this.isEditingItem = true
-    //   this.isIconImageNew = false
     },
     closeEditModal(){
         this.isEditingItem = false
@@ -296,19 +269,14 @@ export default {
     },
 
     showDeletingModal(category, i) {
-      this.showDeleteModal = true;
-      this.deleteItem = category;
-      this.index = i;
-    },
-    async deleteCategory() {
-      const res = await this.callApi("post", "app/delete_category", this.deleteItem);
-      if (res.status == 200) {
-        this.categoryLists.splice(this.index, 1);
-        this.success("Category has been removed successfully!");
-        this.showDeleteModal = false;
-      } else {
-        this.somethingWentWrong();
-      }
+           const deleteModalObj = {
+            showDeleteModal: true,
+            deleteUrl: 'app/delete_category',
+            data: category,
+            index: i,
+            isDeleted: false
+        }
+        this.$store.commit('setDeleteModalObj',deleteModalObj )
     },
     handleSuccess(res, file) {
         res = `/uploads/${res}`
@@ -364,6 +332,7 @@ export default {
     }
   },
   async created() {
+    this.handleSpinCustom()
     this.token = window.Laravel.csrfToken
     const res = await this.callApi("get", "app/get_category")
     if (res.status === 200) {
@@ -372,5 +341,24 @@ export default {
       this.somethingWentWrong()
     }
   },
+   components:{
+      DeleteModal
+  },
+  computed : {
+		...mapGetters(['getDeleteModalObj'])
+	},
+	watch : {
+		getDeleteModalObj(obj){
+			if(obj.isDeleted){
+				this.categoryLists.splice(obj.index, 1)
+			}
+		}
+	}
+
 }
 </script>
+<style>
+    .demo-spin-icon-load{
+        animation: ani-demo-spin 1s linear infinite;
+    }
+</style>

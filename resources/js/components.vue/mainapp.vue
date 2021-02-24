@@ -1,9 +1,6 @@
 <template>
-  <div>
     <div>
-      <h1>Menu</h1>
-      <div>
-        <router-view></router-view>
+      <div v-if="$store.state.user">
         <!--========== ADMIN SIDE MENU one ========-->
         <div class="_1side_menu">
           <div class="_1side_menu_logo">
@@ -23,18 +20,32 @@
               <ul class="_1side_menu_list_ul">
                 <li>
                   <router-link to="/"
-                    ><Icon type="ios-speedometer" /> Dashboard</router-link
+                    ><Icon type="ios-home-outline" /> Dashboard</router-link
+                  >
+                </li>
+                 <li>
+                  <router-link to="users"
+                    ><Icon type="ios-people" /> Users</router-link
                   >
                 </li>
                 <li>
                   <router-link to="tags"
-                    ><Icon type="ios-speedometer" /> Tags</router-link
+                    ><Icon type="ios-pricetag-outline" /> Tags</router-link
                   >
                 </li>
                 <li>
                   <router-link to="category"
-                    ><Icon type="ios-speedometer" /> Category</router-link
+                    ><Icon type="ios-apps-outline" /> Category</router-link
                   >
+                </li>
+                <li>
+                  <router-link to="role"
+                    ><Icon type="ios-people-outline" /> Role Management</router-link
+                  >
+                </li>
+                <li>
+                  <a href="/logout">
+                 <Icon type="ios-log-out" /> Logout</a>
                 </li>
               </ul>
             </div>
@@ -57,8 +68,20 @@
         </div>
         <!--========= HEADER ==========-->
       </div>
-      <!-- <router-view /> -->
+      <router-view />
     </div>
-  </div>
 </template>
+<script>
+export default {
+    props:['user'],
+    data(){
+        return{
+            isLoggedIn: false
+        }
+    },
+    created(){
+        this.$store.commit('updateUser', this.user)
+    }
+}
+</script>
 

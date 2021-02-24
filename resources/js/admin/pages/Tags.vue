@@ -71,7 +71,7 @@
           </div>
         </Modal>
         <!-- modal for deleting tag -->
-        <Modal v-model="showDeleteModal" width="360">
+        <!-- <Modal v-model="showDeleteModal" width="360">
         <p slot="header" style="color:#f60;text-align:center">
             <Icon type="ios-information-circle"></Icon>
             <span>Delete confirmation</span>
@@ -82,12 +82,15 @@
         <div slot="footer">
             <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteTag">Delete</Button>
         </div>
-    </Modal>
+    </Modal> -->
+      <DeleteModal></DeleteModal>
       </div>
     </div>
   </div>
 </template>
 <script>
+import DeleteModal from './components/deleteModal'
+import {mapGetters} from 'vuex'
 export default {
   data() {
     return {
@@ -163,23 +166,18 @@ export default {
     },
 
     showDeletingModal(tag, i){
-        this.showDeleteModal = true
-        this.deleteItem = tag
-        this.index = i
+          const deleteModalObj = {
+            showDeleteModal: true,
+            deleteUrl: 'app/delete_tag',
+            data: tag,
+            index: i,
+            isDeleted: false
+        }
+        this.$store.commit('setDeleteModalObj',deleteModalObj )
     },
-    async deleteTag(){
-        const res = await this.callApi('post', 'app/delete_tag', this.deleteItem)
-        if (res.status == 200) {
-            this.tags.splice(this.index, 1)
-            this.success('Tag has been removed successfully!')
-            this.showDeleteModal = false
-        }
-        else{
-            this.somethingWentWrong()
-        }
-    }
   },
   async created() {
+    this.handleSpinCustom()
     const res = await this.callApi("get", "app/get_tags");
     if (res.status === 200) {
       this.tags = res.data;
@@ -187,5 +185,23 @@ export default {
       this.somethingWentWrong();
     }
   },
+   components:{
+      DeleteModal
+  },
+  computed : {
+		...mapGetters(['getDeleteModalObj'])
+	},
+	watch : {
+		getDeleteModalObj(obj){
+			if(obj.isDeleted){
+				this.tags.splice(obj.index, 1)
+			}
+		}
+	}
 };
 </script>
+<style>
+    .demo-spin-icon-load{
+        animation: ani-demo-spin 1s linear infinite;
+    }
+</style>
