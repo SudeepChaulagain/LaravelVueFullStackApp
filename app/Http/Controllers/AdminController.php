@@ -32,7 +32,29 @@ class AdminController extends Controller
         if ($request->path() == 'login') {
             return redirect('/');
         }
-        return view('welcome');
+        return $this->checkForPermission($user, $request);
+
+
+    }
+
+    //check for permissiom
+    public function checkForPermission($user, $request){
+        $permission = json_decode($user->role->permission); //gives permission object {reousrces,....}
+        $hasPermission = false;
+        if (!$permission) {
+            return view('welcome');
+        }
+        foreach($permission as $p){
+            if ($p->name == $request->path()) {  //permission name->tags chai route tags sanga milcha vanae
+               if ($p->read) { //read permission nai xaina vanae aaru access garna payen so read pahile check garne
+                  $hasPermission = true;
+               }
+            }
+        }
+        if ($hasPermission) {
+            return view('welcome');
+        }
+        return view('pagenotfound');
 
     }
 
@@ -236,6 +258,16 @@ class AdminController extends Controller
         ]);
         return Role::where('id', $request->id)->update([
             'rolename' => $request->rolename,
+        ]);
+    }
+
+    public function assignRole(Request $request){
+        $this->validate($request,[
+            'permission' => 'required',
+            'id' => 'required'
+        ]);
+        return Role::where('id', $request->id)->update([
+            'permission' => $request->permission
         ]);
     }
 

@@ -7,7 +7,7 @@
           class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20"
         >
           <p class="_title0">
-            Tags <Button @click="addModal = true"><Icon type="md-add" />Add tag</Button>
+            Tags <Button @click="addModal = true" v-if="isWritePermitted"><Icon type="md-add" />Add tag</Button>
           </p>
 
           <div class="_overflow _table_div">
@@ -29,8 +29,8 @@
                 </td>
                 <td>{{tag.created_at}}</td>
                 <td>
-                  <Button type="info" size="small" @click="showEditModal(tag,i)"> Edit </Button>
-                  <Button type="error" size="small" @click="showDeletingModal(tag, i)"> Delete </Button>
+                  <Button type="info" size="small" @click="showEditModal(tag,i)" v-if="isUpdatePermitted"> Edit </Button>
+                  <Button type="error" size="small" @click="showDeletingModal(tag, i)" v-if="isDeletePermitted"> Delete </Button>
                 </td>
               </tr>
               <!-- ITEMS -->
@@ -70,19 +70,6 @@
             >{{isEditing ? 'Editing...' : 'Edit tag'}}</Button>
           </div>
         </Modal>
-        <!-- modal for deleting tag -->
-        <!-- <Modal v-model="showDeleteModal" width="360">
-        <p slot="header" style="color:#f60;text-align:center">
-            <Icon type="ios-information-circle"></Icon>
-            <span>Delete confirmation</span>
-        </p>
-        <div style="text-align:center">
-            <p>Are you sure you want to delete it?</p>
-        </div>
-        <div slot="footer">
-            <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteTag">Delete</Button>
-        </div>
-    </Modal> -->
       <DeleteModal></DeleteModal>
       </div>
     </div>

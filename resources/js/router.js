@@ -8,7 +8,10 @@ import Category from './admin/pages/Category.vue'
 import AdminUsers from './admin/pages/AdminUsers.vue'
 import Login from './admin/pages/Login.vue'
 import Role from './admin/pages/Role.vue'
+import AssignRole from './admin/pages/AssignRole.vue'
 import Home from './components.vue/pages/Home.vue'
+
+
 
 
 Vue.use(Router)
@@ -16,27 +19,38 @@ Vue.use(Router)
 const routes = [
     {
     path: '/tags',
-    component: Tags
+    component: Tags,
+    name: 'tags'
     },
     {
     path: '/',
-    component: Home
+    component: Home,
+    name: 'home'
     },
     {
         path: '/users',
-        component: AdminUsers
+        component: AdminUsers,
+        name: 'users'
     },
     {
     path: '/category',
-    component: Category
+    component: Category,
+    name: 'category'
     },
     {
     path: '/login',
-    component: Login
+    component: Login,
+    name: 'login'
     },
     {
         path:'/role',
-        component: Role
+        component: Role,
+        name: 'role'
+    },
+    {
+        path: '/assignRole',
+        component: AssignRole,
+        name: 'assignRole'
     }
 
 ]

@@ -1,5 +1,5 @@
 import Axios from "axios"
-
+import {mapGetters} from 'vuex'
 export default {
     data(){
         return{
@@ -69,12 +69,41 @@ export default {
             }, 2000);
         },
 
-        // handleSpinShow () {
-        //     this.$Spin.show();
-        //     setTimeout(() => {
-        //         this.$Spin.hide();
-        //     }, 1000);
-        // },
+        //yeha key read, write, update, delete huncha jun chai tala computed property bata pathaincha
+        checkUserPermission(key){
+            //yedi permission diyeko chaina vanae true return gardine i.e sabai permission paucha
+            if(!this.userPermission) return true
+            let isPermitted = false
+            for(let data of this.userPermission){
+                //data aayesi route ko name ra userPermisison object ma hune name ko value same cha vane i.e tags = tags cha vanae matrai persmission check garne
+                if(this.$route.name==data.name){
+                    if(data[key]){
+                        isPermitted = true
+                        break
+                    }
+                    break
+                }
+            }
+            return isPermitted
+        }
+    },
+    computed:{
+        ...mapGetters({
+            'userPermission':'getUserPermission'
+        }),
+        isReadPermitted(){
+            return this.checkUserPermission('read')
+        },
+        isWritePermitted(){
+            return this.checkUserPermission('write')
+        },
+        isUpdatePermitted(){
+            return this.checkUserPermission('update')
+        },
+        isDeletePermitted(){
+            return this.checkUserPermission('delete')
+
+        },
     }
 }
 

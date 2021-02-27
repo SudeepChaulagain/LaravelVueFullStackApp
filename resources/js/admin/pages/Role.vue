@@ -5,7 +5,7 @@
 
 				<!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
 				<div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-					<p class="_title0">Role Manangement <Button @click="addModal=true"><Icon type="md-add" /> Add a new role</Button></p>
+					<p class="_title0">Role Manangement <Button @click="addModal=true" v-if="isWritePermitted"><Icon type="md-add" /> Add a new role</Button></p>
 
 					<div class="_overflow _table_div">
 						<table class="_table">
@@ -25,8 +25,8 @@
 								<td class="_table_name">{{role.rolename}}</td>
 								<td>{{role.created_at}}</td>
 								<td>
-									<Button type="info" size="small" @click="showEditModal(role, i)">Edit</Button>
-									<Button type="error" size="small" @click="showDeletingModal(role, i)"  :loading="role.isDeleting">Delete</Button>
+									<Button type="info" size="small" @click="showEditModal(role, i)" v-if="isUpdatePermitted">Edit</Button>
+									<Button type="error" size="small" @click="showDeletingModal(role, i)" :loading="role.isDeleting" v-if="isDeletePermitted">Delete</Button>
 								</td>
 							</tr>
 								<!-- ITEMS -->

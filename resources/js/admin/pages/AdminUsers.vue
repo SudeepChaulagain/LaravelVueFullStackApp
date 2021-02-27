@@ -8,7 +8,7 @@
         >
           <p class="_title0">
             Users
-            <Button @click="addModal = true"
+            <Button @click="addModal = true" v-if="isWritePermitted"
               ><Icon type="md-add" />Add User</Button
             >
           </p>
@@ -38,14 +38,14 @@
                     type="info"
                     size="small"
                     @click="showEditModal(user, i)"
-                    >Edit</Button
+                    v-if="isUpdatePermitted">Edit</Button
                   >
                   <Button
                     type="error"
                     size="small"
                     @click="showDeletingModal(user, i)"
                     :loading="user.isDeleting"
-                    >Delete</Button
+                    v-if="isDeletePermitted">Delete</Button
                   >
                 </td>
               </tr>
